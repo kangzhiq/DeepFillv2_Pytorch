@@ -29,6 +29,7 @@ class InpaintDataset(Dataset):
         # image
         global SEED
         img = cv2.imread(self.imglist[index])
+        img = cv2.reszie(img, (512, 512))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # set the different image size for each batch (data augmentation)
         if index % self.opt.batch_size == 0:
