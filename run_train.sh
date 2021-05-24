@@ -1,5 +1,5 @@
 python3 train.py \
---baseroot '../../inpainting/dataset/Places/img_set' \
+--baseroot '/mnt2/download/CASIA-WebFace' \
 --save_path './models' \
 --sample_path './samples' \
 --gpu_ids '0,1' \
