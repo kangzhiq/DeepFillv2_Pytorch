@@ -9,7 +9,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 
 import network
-import train_dataset
+import train_dataset_casia
 import utils
 
 def WGAN_trainer(opt):
@@ -110,7 +110,7 @@ def WGAN_trainer(opt):
     # ----------------------------------------
 
     # Define the dataset
-    trainset = train_dataset.InpaintDataset(opt)
+    trainset = train_dataset_casia.InpaintDataset(opt)
     print('The overall number of images equals to %d' % len(trainset))
 
     # Define the dataloader
@@ -128,14 +128,14 @@ def WGAN_trainer(opt):
 
     # Training loop
     for epoch in range(opt.resume_epoch, opt.epochs):
-        for batch_idx, (img, y, x, height, width) in enumerate(dataloader):
+        for batch_idx, (img, mask, height, width) in enumerate(dataloader):
 
             img = img.cuda()
             # set the same free form masks for each batch
-            mask = torch.empty(img.shape[0], 1, img.shape[2], img.shape[3]).cuda()
-            for i in range(opt.batch_size):
-                mask[i] = torch.from_numpy(train_dataset.InpaintDataset.random_ff_mask(
-                                                shape=(height[0], width[0])).astype(np.float32)).cuda()
+            #mask = torch.empty(img.shape[0], 1, img.shape[2], img.shape[3]).cuda()
+            #for i in range(opt.batch_size):
+            #    mask[i] = torch.from_numpy(train_dataset_casia.InpaintDataset.random_ff_mask(
+            #                                    shape=(height[0], width[0])).astype(np.float32)).cuda()
             
             # LSGAN vectors
             valid = Tensor(np.ones((img.shape[0], 1, height[0]//32, width[0]//32)))
