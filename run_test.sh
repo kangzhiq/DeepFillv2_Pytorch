@@ -1,10 +1,10 @@
 python3 test.py \
---baseroot './test_data/' \
---baseroot_mask './test_data_mask/' \
+--baseroot '/mnt2/download/test/input/' \
+--baseroot_mask '/mnt2/download/test/mask/' \
 --results_path './results' \
 --gan_type 'WGAN' \
 --gpu_ids '1' \
---epoch 40 \
+--epoch 1 \
 --batch_size 1 \
 --num_workers 8 \
 --pad_type 'zero' \

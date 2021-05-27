@@ -56,9 +56,13 @@ def savetxt(name, loss_log):
 def get_files(path):
     # read a folder, return the complete path
     ret = []
+    i = 0
     for root, dirs, files in os.walk(path):
         for filespath in files:
+            if i > 100000:
+                return ret
             ret.append(os.path.join(root, filespath))
+            i += 1
     return ret
 
 def get_names(path):

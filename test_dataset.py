@@ -2,7 +2,6 @@ import os
 import cv2
 import numpy as np
 import torch
-import imgcrop
 import random
 import math
 from PIL import Image, ImageDraw
@@ -25,6 +24,9 @@ class InpaintDataset(Dataset):
         # image
         img = cv2.imread(self.imglist[index])
         mask = cv2.imread(self.masklist[index])[:, :, 0]
+        temp = np.zeros_like(mask)
+        temp[mask == 0] = 255
+        mask = temp
         # find the Minimum bounding rectangle in the mask
         '''
         contours, hier = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -33,6 +35,11 @@ class InpaintDataset(Dataset):
             mask[y:y+h, x:x+w] = 255
         '''
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (512, 512))
+        mask = cv2.resize(mask, (512, 512))
+        mask[mask < 125] = 0
+        mask[mask >= 125] = 255
+        cv2.imwrite('/mnt2/download/test/test.jpg', mask)
 
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
         mask = torch.from_numpy(mask.astype(np.float32) / 255.0).unsqueeze(0).contiguous()

@@ -17,18 +17,18 @@ def WGAN_tester(opt):
     
     # Save the model if pre_train == True
     def load_model_generator(net, epoch, opt):
-        model_name = 'deepfillv2_WGAN_G_epoch%d_batchsize%d.pth' % (epoch, 4)
-        model_name = os.path.join('pretrained_model', model_name)
+        model_name = 'deepfillv2_WGAN_G_epoch%d_batchsize%d.pth' % (epoch, 6)
+        model_name = os.path.join('models', model_name)
         pretrained_dict = torch.load(model_name)
         generator.load_state_dict(pretrained_dict)
 
     # ----------------------------------------
     #      Initialize training parameters
     # ----------------------------------------
-
+    
     # configurations
-    if not os.path.exists(results_path):
-        os.makedirs(results_path)
+    if not os.path.exists(opt.results_path):
+        os.makedirs(opt.results_path)
 
     # Build networks
     generator = utils.create_generator(opt).eval()
@@ -70,5 +70,5 @@ def WGAN_tester(opt):
         mask = torch.cat((mask, mask, mask), 1)
         img_list = [second_out_wholeimg]
         name_list = ['second_out']
-        utils.save_sample_png(sample_folder = results_path, sample_name = '%d' % (batch_idx + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
+        utils.save_sample_png(sample_folder = opt.results_path, sample_name = '%d' % (batch_idx + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
         print('----------------------batch_idx%d' % (batch_idx + 1) + ' has been finished----------------------')

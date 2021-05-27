@@ -8,8 +8,8 @@ python3 train.py \
 --checkpoint_interval 1 \
 --multi_gpu True \
 --load_name '' \
---epochs 41 \
---batch_size 2 \
+--epochs 43 \
+--batch_size 6 \
 --lr_g 1e-4 \
 --lr_d 1e-4 \
 --lambda_l1 10 \
