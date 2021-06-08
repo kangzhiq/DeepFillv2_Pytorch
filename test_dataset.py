@@ -14,18 +14,19 @@ import utils
 class InpaintDataset(Dataset):
     def __init__(self, opt):
         self.opt = opt
-        self.imglist = sorted(utils.get_files(opt.baseroot), key=lambda d:int(d.split('/')[-1].split('.')[0]))
-        self.masklist = sorted(utils.get_files(opt.baseroot_mask), key=lambda d:int(d.split('/')[-1].split('.')[0]))
-
+        #self.imglist = sorted(utils.get_files(opt.baseroot), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+        #self.masklist = sorted(utils.get_files(opt.baseroot_mask), key=lambda d:int(d.split('/')[-1].split('.')[0]))
+        self.imglist = sorted(utils.get_files(opt.baseroot), key=lambda d:d.split('/')[-2:])
+        self.masklist = sorted(utils.get_files(opt.baseroot_mask), key=lambda d:d.split('/')[-2:])
     def __len__(self):
         return len(self.imglist)
 
     def __getitem__(self, index):
         # image
-        img = cv2.imread(self.imglist[index])
+        img = cv2.imread(self.imglist[index]) 
         mask = cv2.imread(self.masklist[index])[:, :, 0]
         temp = np.zeros_like(mask)
-        temp[mask == 0] = 255
+        temp[mask < 125] = 255
         mask = temp
         # find the Minimum bounding rectangle in the mask
         '''
@@ -39,8 +40,10 @@ class InpaintDataset(Dataset):
         mask = cv2.resize(mask, (512, 512))
         mask[mask < 125] = 0
         mask[mask >= 125] = 255
-        cv2.imwrite('/mnt2/download/test/test.jpg', mask)
+        a = img.copy()
+        a[mask >= 125] = [255, 255, 255]
+        cv2.imwrite(self.masklist[index].replace('/mask/', '/input_masked/'), cv2.cvtColor(a, cv2.COLOR_RGB2BGR))
 
-        img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
+        img = torch.from_numpy(a.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
         mask = torch.from_numpy(mask.astype(np.float32) / 255.0).unsqueeze(0).contiguous()
         return img, mask

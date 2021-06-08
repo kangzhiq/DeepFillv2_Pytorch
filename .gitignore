@@ -1,0 +1,5 @@
+*.pth
+results/*
+*.jpg
+*.png
+*.zip

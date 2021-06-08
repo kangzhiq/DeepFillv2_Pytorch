@@ -128,9 +128,10 @@ def WGAN_trainer(opt):
 
     # Training loop
     for epoch in range(opt.resume_epoch, opt.epochs):
-        for batch_idx, (img, mask, height, width) in enumerate(dataloader):
-
+        for batch_idx, (gt, img, mask, height, width) in enumerate(dataloader):
+            gt = gt.cuda()
             img = img.cuda()
+            mask = mask.cuda()
             # set the same free form masks for each batch
             #mask = torch.empty(img.shape[0], 1, img.shape[2], img.shape[3]).cuda()
             #for i in range(opt.batch_size):
@@ -155,7 +156,7 @@ def WGAN_trainer(opt):
             # Fake samples
             fake_scalar = discriminator(second_out_wholeimg.detach(), mask)
             # True samples
-            true_scalar = discriminator(img, mask)
+            true_scalar = discriminator(gt, mask)
             
             # Loss and optimize
             loss_fake = -torch.mean(torch.min(zero, -valid-fake_scalar))
@@ -169,15 +170,15 @@ def WGAN_trainer(opt):
             optimizer_g.zero_grad()
 
             # L1 Loss
-            first_L1Loss = (first_out - img).abs().mean()
-            second_L1Loss = (second_out - img).abs().mean()
+            first_L1Loss = (first_out - gt).abs().mean()
+            second_L1Loss = (second_out - gt).abs().mean()
             
             # GAN Loss
             fake_scalar = discriminator(second_out_wholeimg, mask)
             GAN_Loss = -torch.mean(fake_scalar)
 
             # Get the deep semantic feature maps, and compute Perceptual Loss
-            img_featuremaps = perceptualnet(img)                          # feature maps
+            img_featuremaps = perceptualnet(gt)                          # feature maps
             second_out_featuremaps = perceptualnet(second_out)
             second_PerceptualLoss = L1Loss(second_out_featuremaps, img_featuremaps)
 
@@ -202,8 +203,8 @@ def WGAN_trainer(opt):
             masked_img = img * (1 - mask) + mask
             mask = torch.cat((mask, mask, mask), 1)
             if (batch_idx + 1) % 40 == 0:
-                img_list = [img, mask, masked_img, first_out, second_out]
-                name_list = ['gt', 'mask', 'masked_img', 'first_out', 'second_out']
+                img_list = [gt, img, mask, masked_img, first_out, second_out]
+                name_list = ['gt', 'img_holes', 'mask', 'masked_img', 'first_out', 'second_out']
                 utils.save_sample_png(sample_folder = sample_folder, sample_name = 'epoch%d' % (epoch + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)
 
         # Learning rate decrease
@@ -216,6 +217,6 @@ def WGAN_trainer(opt):
 
         ### Sample data every epoch
         if (epoch + 1) % 1 == 0:
-            img_list = [img, mask, masked_img, first_out, second_out]
-            name_list = ['gt', 'mask', 'masked_img', 'first_out', 'second_out']
+            img_list = [gt, img, mask, masked_img, first_out, second_out]
+            name_list = ['gt', 'img_holes', 'mask', 'masked_img', 'first_out', 'second_out']
             utils.save_sample_png(sample_folder = sample_folder, sample_name = 'epoch%d' % (epoch + 1), img_list = img_list, name_list = name_list, pixel_max_cnt = 255)

@@ -1,14 +1,15 @@
+export TORCH_HOME=/mnt2/download
 python3 train_casia.py \
---baseroot '/mnt2/download/CASIA_RR_new/input' \
---save_path './models' \
---sample_path './samples' \
+--baseroot '/mnt2/download/CASIA-WebFace' \
+--save_path './models_holes' \
+--sample_path './samples_holes' \
 --gpu_ids '0,1' \
 --gan_type 'WGAN' \
 --cudnn_benchmark True \
 --checkpoint_interval 1 \
 --multi_gpu True \
 --load_name '' \
---epochs 43 \
+--epochs 12 \
 --batch_size 6 \
 --lr_g 1e-4 \
 --lr_d 1e-4 \

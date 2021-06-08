@@ -1,10 +1,10 @@
 python3 test.py \
---baseroot '/mnt2/download/test/input/' \
---baseroot_mask '/mnt2/download/test/mask/' \
---results_path './results' \
+--baseroot '/data/LRW_front_mask/input/ABOUT/test/ABOUT_00002/' \
+--baseroot_mask '/data/LRW_front_mask/mask/ABOUT/test/ABOUT_00002/' \
+--results_path './res_LRW' \
 --gan_type 'WGAN' \
 --gpu_ids '1' \
---epoch 1 \
+--epoch 4 \
 --batch_size 1 \
 --num_workers 8 \
 --pad_type 'zero' \

@@ -19,7 +19,7 @@ class InpaintDataset(Dataset):
     def __init__(self, opt):
         assert opt.mask_type in ALLMASKTYPES
         self.opt = opt
-        self.imglist = utils.get_files(opt.baseroot)
+        self.imglist = utils.get_files_casia(opt.baseroot)
 
     def __len__(self):
         return len(self.imglist)
@@ -27,7 +27,12 @@ class InpaintDataset(Dataset):
     def __getitem__(self, index):
         # image
         global SEED
-        path_input = self.imglist[index]
+        path_gt = self.imglist[index]
+        gt = cv2.imread(path_gt)
+        gt = cv2.resize(gt, (512, 512))
+        gt = cv2.cvtColor(gt, cv2.COLOR_BGR2RGB)
+
+        path_input = path_gt.replace("CASIA-WebFace", "CASIA_RR_new/input")
         img = cv2.imread(path_input)
         img = cv2.resize(img, (512, 512))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -37,18 +42,22 @@ class InpaintDataset(Dataset):
         img, y, x,  height, width = self.random_crop(img, SEED)
 
         # Load mask
-        path_mask = path_input.replace("input", "mask")
+        path_mask = path_gt.replace("CASIA-WebFace", "CASIA_RR_new/mask")
         mask_raw = cv2.imread(path_mask)
         mask_raw = cv2.resize(mask_raw, (512, 512))
         mask_raw_cropped = mask_raw[y: y + height, x: x + width, 0]
         mask = np.zeros((mask_raw_cropped.shape[:2]))
         mask[mask_raw_cropped < 125] = 1
-        mask = mask.reshape((1,) + mask.shape).astype(np.float32)
+        mask = torch.from_numpy(mask.reshape((1,) + mask.shape).astype(np.float32))
+
+        # crop gt
+        gt_cropped = gt[y: y + height, x: x + width, :]
+        gt = torch.from_numpy(gt_cropped.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
 
         img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
 #         mask = torch.from_numpy(mask.astype(np.float32)).contiguous()
 #         mask = self.random_mask()[0]
-        return img, mask, height, width
+        return gt, img, mask, height, width
 
     def random_crop(self, img, seed):
         width_list = [256, 320, 400, 480]

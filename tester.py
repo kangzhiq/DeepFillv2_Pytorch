@@ -18,7 +18,7 @@ def WGAN_tester(opt):
     # Save the model if pre_train == True
     def load_model_generator(net, epoch, opt):
         model_name = 'deepfillv2_WGAN_G_epoch%d_batchsize%d.pth' % (epoch, 6)
-        model_name = os.path.join('models', model_name)
+        model_name = os.path.join('models_holes', model_name)
         pretrained_dict = torch.load(model_name)
         generator.load_state_dict(pretrained_dict)
 

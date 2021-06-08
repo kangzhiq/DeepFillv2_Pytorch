@@ -65,6 +65,16 @@ def get_files(path):
             i += 1
     return ret
 
+def get_files_casia(path):
+    # read a folder, return the complete path
+    ret = []
+    i = 0
+    for root, dirs, files in os.walk(path.replace("CASIA-WebFace", "CASIA_RR_new/mask")):
+        for filespath in files:
+            ret.append(os.path.join(root, filespath).replace("CASIA_RR_new/mask", "CASIA-WebFace"))
+            i += 1
+    return ret
+
 def get_names(path):
     # read a folder, return the image name
     ret = []
